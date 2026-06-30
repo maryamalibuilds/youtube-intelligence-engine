@@ -64,7 +64,7 @@ class Orchestrator:
 
     def _route_rules(self, query: str) -> str:
         q = query.lower()
-        if re.search(r"\b(summar|overview|tl;?dr|gist|recap)\b", q):
+        if re.search(r"\b(summar\w*|overview|tl;?dr|gist|recap|sum up)\b", q):
             return "summarize"
         if re.search(r"\b(sentiment|like|dislike|love|hate|positive|negative|opinion|feel)\b", q):
             return "sentiment_insight"
