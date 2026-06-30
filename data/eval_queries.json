@@ -1,0 +1,5 @@
+[
+  {"query": "Is the audio quality good?", "relevant": ["audio", "sound"]},
+  {"query": "Do people like the tutorial?", "relevant": ["gr8", "great", "luv", "love"]},
+  {"query": "What do viewers complain about?", "relevant": ["sux", "bad", "hate"]}
+]
