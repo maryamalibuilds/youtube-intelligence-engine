@@ -96,6 +96,18 @@ def run(comments: List[Dict], out: str = "comments"):
     return enriched
 
 
+def process_video(url_or_id: str, max_comments: int = 300, api_key: str = ""):
+    """Fetch one video's comments (by URL or id) and run the full pipeline.
+
+    Backs the dashboard's "paste a URL -> scrape & analyze" button.
+    """
+    from src.scrape.youtube_scraper import extract_video_id, fetch_comments
+
+    vid = extract_video_id(url_or_id)
+    comments = fetch_comments(vid, max_comments, api_key=api_key)
+    return run(comments, out=vid)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--video")

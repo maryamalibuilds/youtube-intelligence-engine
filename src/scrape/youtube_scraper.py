@@ -12,10 +12,27 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Dict, List
 
-from config import RAW_DIR, YOUTUBE_API_KEY, has_youtube
+from config import RAW_DIR, YOUTUBE_API_KEY
+
+_YT_ID_RE = re.compile(
+    r"(?:v=|vi=|youtu\.be/|/shorts/|/embed/|/v/|/live/)([A-Za-z0-9_-]{11})"
+)
+
+
+def extract_video_id(url_or_id: str) -> str:
+    """Pull the 11-char video id from any YouTube URL form (watch, youtu.be,
+    shorts, embed, live) or accept a raw id as-is."""
+    s = (url_or_id or "").strip()
+    if re.fullmatch(r"[A-Za-z0-9_-]{11}", s):
+        return s
+    m = _YT_ID_RE.search(s)
+    if m:
+        return m.group(1)
+    raise ValueError(f"Couldn't find a YouTube video id in: {url_or_id!r}")
 
 _SAMPLE = [
     {"video_id": "demo", "comment_id": "c1", "author": "alice",
@@ -27,19 +44,26 @@ _SAMPLE = [
 ]
 
 
-def _client():
+def _client(api_key: str = ""):
     from googleapiclient.discovery import build
 
-    return build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+    return build("youtube", "v3", developerKey=api_key or YOUTUBE_API_KEY)
 
 
-def fetch_comments(video_id: str, max_comments: int = 500) -> List[Dict]:
-    """Return top-level comments (threaded replies flattened) for a video."""
-    if not has_youtube():
+def fetch_comments(video_id: str, max_comments: int = 500,
+                   api_key: str = "") -> List[Dict]:
+    """Return top-level comments (threaded replies flattened) for a video.
+
+    ``video_id`` may also be a full YouTube URL — it's parsed automatically.
+    Pass ``api_key`` to override the .env key (used by the dashboard input).
+    """
+    key = api_key or YOUTUBE_API_KEY
+    if not key or video_id == "demo":
         print("[scraper] No YOUTUBE_API_KEY set -> returning offline sample.")
-        return [c for c in _SAMPLE]
+        return [dict(c) for c in _SAMPLE]
 
-    yt = _client()
+    video_id = extract_video_id(video_id)
+    yt = _client(key)
     out: List[Dict] = []
     page_token = None
     while len(out) < max_comments:
@@ -55,9 +79,12 @@ def fetch_comments(video_id: str, max_comments: int = 500) -> List[Dict]:
                 "video_id": video_id,
                 "comment_id": item["id"],
                 "author": s.get("authorDisplayName", ""),
-                "text": s.get("textDisplay", ""),
+                # textOriginal = the commenter's raw text (no HTML entities like
+                # &#39;). Best input for the cleaner; matches the Moodle sample.
+                "text": s.get("textOriginal", s.get("textDisplay", "")),
                 "likes": s.get("likeCount", 0),
                 "published_at": s.get("publishedAt", ""),
+                "is_public": item["snippet"].get("isPublic", True),
             })
         page_token = resp.get("nextPageToken")
         if not page_token:
@@ -65,10 +92,11 @@ def fetch_comments(video_id: str, max_comments: int = 500) -> List[Dict]:
     return out[:max_comments]
 
 
-def search_videos(query: str, n: int = 5) -> List[str]:
-    if not has_youtube():
+def search_videos(query: str, n: int = 5, api_key: str = "") -> List[str]:
+    key = api_key or YOUTUBE_API_KEY
+    if not key:
         return ["demo"]
-    yt = _client()
+    yt = _client(key)
     resp = yt.search().list(part="id", q=query, type="video", maxResults=n).execute()
     return [i["id"]["videoId"] for i in resp.get("items", [])]
 
