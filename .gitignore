@@ -1,0 +1,24 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Data artifacts (keep dictionaries + small samples, ignore bulk)
+data/raw/*.json
+data/raw/*.csv
+data/processed/*
+!data/processed/.gitkeep
+
+# ML / experiment tracking
+mlruns/
+*.ckpt
+.chroma/
+
+# OS
+.DS_Store

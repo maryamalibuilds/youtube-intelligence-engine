@@ -1,0 +1,43 @@
+# ---- Core ----
+python-dotenv>=1.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+tqdm>=4.66.0
+
+# ---- Scraping (YouTube Data API v3) ----
+google-api-python-client>=2.100.0
+
+# ---- Preprocessing / NLP ----
+nltk>=3.8.1
+symspellpy>=6.7.7          # fast spell correction
+emoji>=2.8.0
+spacy>=3.7.0               # NER (run: python -m spacy download en_core_web_sm)
+
+# ---- Insight extraction ----
+keybert>=0.8.0             # keyword extraction
+yake>=0.4.8                # lightweight keyword fallback
+transformers>=4.40.0       # sentiment (cardiffnlp twitter-roberta)
+torch>=2.2.0
+scikit-learn>=1.3.0
+
+# ---- Topic modeling ----
+bertopic>=0.16.0
+umap-learn>=0.5.5
+hdbscan>=0.8.33
+
+# ---- RAG ----
+sentence-transformers>=2.7.0
+chromadb>=0.5.0            # local vector DB (no server needed)
+rank-bm25>=0.2.2          # lexical retrieval for hybrid search
+
+# ---- LLM / Agent ----
+# Pick ONE provider; both are optional and lazily imported.
+openai>=1.30.0            # or use a local model via llama-cpp / ollama
+anthropic>=0.30.0
+
+# ---- Monitoring ----
+mlflow>=2.14.0
+
+# ---- Dashboard ----
+streamlit>=1.36.0
+plotly>=5.22.0
