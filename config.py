@@ -32,10 +32,12 @@ for _d in (RAW_DIR, PROCESSED_DIR):
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 # --- LLM ---
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()
-LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
+# Default provider is Groq: free, fast, OpenAI-compatible. Override via env.
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").lower()
+LLM_MODEL = os.getenv("LLM_MODEL", "")  # empty -> generator picks a per-provider default
 
 # --- Models / stores ---
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
@@ -50,4 +52,4 @@ def has_youtube() -> bool:
 
 
 def has_llm() -> bool:
-    return bool(OPENAI_API_KEY or ANTHROPIC_API_KEY) or LLM_PROVIDER == "local"
+    return bool(GROQ_API_KEY or OPENAI_API_KEY or ANTHROPIC_API_KEY) or LLM_PROVIDER == "local"

@@ -42,20 +42,20 @@ with st.sidebar:
     st.header("🔑 API keys")
     yt_key = st.text_input("YouTube API key", type="password", key="youtube_key",
                            help="YouTube Data API v3 key from the Google Cloud console.")
-    oa_key = st.text_input("OpenAI API key", type="password", key="openai_key",
-                           help="Used for RAG Q&A + summarization (the Ask tab).")
+    groq_key = st.text_input("Groq API key (free)", type="password", key="groq_key",
+                             help="Free key from console.groq.com — powers the Ask tab.")
     st.caption("Kept only for this browser session — never written to disk or git.")
     st.markdown(
-        f"YouTube&nbsp;{'✅' if yt_key else '⬜'} &nbsp;·&nbsp; OpenAI&nbsp;{'✅' if oa_key else '⬜'}",
+        f"YouTube&nbsp;{'✅' if yt_key else '⬜'} &nbsp;·&nbsp; Groq&nbsp;{'✅' if groq_key else '⬜'}",
         unsafe_allow_html=True,
     )
 
 # Propagate keys to the environment so the scraper + generator read them live.
 if st.session_state.get("youtube_key"):
     os.environ["YOUTUBE_API_KEY"] = st.session_state["youtube_key"]
-if st.session_state.get("openai_key"):
-    os.environ["OPENAI_API_KEY"] = st.session_state["openai_key"]
-    os.environ["LLM_PROVIDER"] = "openai"
+if st.session_state.get("groq_key"):
+    os.environ["GROQ_API_KEY"] = st.session_state["groq_key"]
+    os.environ["LLM_PROVIDER"] = "groq"
 
 
 # ---- Main panel: paste a link, analyze ---------------------------------------
@@ -116,8 +116,8 @@ with tab_overview:
     st.write(kws.most_common(20))
 
 with tab_ask:
-    if not st.session_state.get("openai_key"):
-        st.warning("Add your OpenAI key in the sidebar for generated answers — "
+    if not st.session_state.get("groq_key"):
+        st.warning("Add your free Groq key in the sidebar for generated answers — "
                    "retrieval/evidence still works without it.")
     st.caption("Routed by the agent to Q&A, summarization, or sentiment insight.")
     q = st.text_input("Ask about the comments", "Summarize what people think")
