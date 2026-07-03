@@ -112,11 +112,13 @@ Contractions win over acronyms on key collisions; multi-word keys
 
 ## Evidence / Screenshots
 
+## Evidence / Screenshots
+
 ### Dataset Construction
 
 The final dataset contains 10,764 raw comments, 10,764 enriched comments and 63 unique videos.
 
-![Dataset proof](docs/screenshots/dataset-proof.png)
+![Dataset proof](./1-10k%20data%20set%20scraping.png)
 
 ---
 
@@ -124,15 +126,23 @@ The final dataset contains 10,764 raw comments, 10,764 enriched comments and 63 
 
 The Streamlit dashboard displays the final dataset size and sentiment distribution.
 
-![Dashboard overview](docs/screenshots/dashboard-overview.png)
+![Dashboard overview](./1%29dashboard.png)
 
 ---
 
 ### Topic Modelling
 
-Final cleaned topic modelling results were generated after removing noisy emoji-related terms.
+Initial topic modelling was noisy because YouTube comments contained emoji-related tokens and repeated informal words.
 
-![Final topic modelling](docs/screenshots/topic-modeling-final.png)
+![Initial topic modelling](./2-topic%20modeling.png)
+
+The topic modelling was then improved with extra cleaning and stopwords.
+
+![Cleaner topic modelling](./3-%20cleaner%20topic%20modelling.png)
+
+The final cleaned topic modelling results were used in the report.
+
+![Final topic modelling](./4-cleanest%20topic%20modelling.png)
 
 ---
 
@@ -140,7 +150,7 @@ Final cleaned topic modelling results were generated after removing noisy emoji-
 
 Semantic, lexical and hybrid retrieval strategies were evaluated using hit rate@5 and MRR.
 
-![Retrieval evaluation](docs/screenshots/retrieval-evaluation.png)
+![Retrieval evaluation](./5-results.png)
 
 ---
 
@@ -148,6 +158,8 @@ Semantic, lexical and hybrid retrieval strategies were evaluated using hit rate@
 
 MLflow was used to track pipeline and retrieval evaluation runs.
 
-![MLflow runs](docs/screenshots/mlflow-runs.png)
+![MLflow runs](./7-ml%20run.png)
 
-![MLflow hybrid metrics](docs/screenshots/mlflow-hybrid-metrics.png)
+The hybrid retrieval run recorded hit_rate_at_5 = 0.75 and MRR = 0.75.
+
+![MLflow hybrid metrics](./8-ml%20hybrid%20metrics.png)
