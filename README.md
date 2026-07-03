@@ -476,24 +476,5 @@ Future improvements could include:
 
 ---
 
-## Final Status
 
-- [x] Fitness coaching topic selected
-- [x] YouTube comments scraped
-- [x] 10,764-comment dataset created
-- [x] Preprocessing completed
-- [x] Sentiment analysis completed
-- [x] Keyword extraction completed
-- [x] NER completed
-- [x] Topic modelling completed
-- [x] ChromaDB indexing completed
-- [x] Retrieval evaluation completed
-- [x] MLflow monitoring completed
-- [x] Dashboard completed
-- [x] Final report completed
 
----
-
-## Notes
-
-This project was developed for the CSCI370 NLP course project. It demonstrates how noisy YouTube comments can be converted into structured insights using an end-to-end NLP and RAG pipeline.
