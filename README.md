@@ -110,13 +110,44 @@ Contractions win over acronyms on key collisions; multi-word keys
 | Evaluation & monitoring (15%) | `monitoring/evaluate` + MLflow |
 | Dashboard | `app/dashboard` |
 
-## Status / TODO
+## Evidence / Screenshots
 
-- [x] Project scaffold, config, dictionaries wired in
-- [x] Preprocessing (contractions + acronyms + spell) — implemented & tested
-- [x] Enrichment, RAG, agent, MLflow, dashboard — implemented (need API keys to scrape/generate)
-- [ ] Add your YouTube key, pick a topic, scrape a real dataset
-- [ ] Build `eval_queries.json` gold set and run `evaluate_retrieval_strategies`
-- [ ] Tune topic model `min_topic_size` to your corpus size
-- [ ] Write the report (see `docs/REPORT.md`)
-```
+### Dataset Construction
+
+The final dataset contains 10,764 raw comments, 10,764 enriched comments and 63 unique videos.
+
+![Dataset proof](docs/screenshots/dataset-proof.png)
+
+---
+
+### Dashboard Overview
+
+The Streamlit dashboard displays the final dataset size and sentiment distribution.
+
+![Dashboard overview](docs/screenshots/dashboard-overview.png)
+
+---
+
+### Topic Modelling
+
+Final cleaned topic modelling results were generated after removing noisy emoji-related terms.
+
+![Final topic modelling](docs/screenshots/topic-modeling-final.png)
+
+---
+
+### Retrieval Evaluation
+
+Semantic, lexical and hybrid retrieval strategies were evaluated using hit rate@5 and MRR.
+
+![Retrieval evaluation](docs/screenshots/retrieval-evaluation.png)
+
+---
+
+### MLflow Monitoring
+
+MLflow was used to track pipeline and retrieval evaluation runs.
+
+![MLflow runs](docs/screenshots/mlflow-runs.png)
+
+![MLflow hybrid metrics](docs/screenshots/mlflow-hybrid-metrics.png)
