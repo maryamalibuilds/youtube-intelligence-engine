@@ -1,134 +1,10 @@
 # YouTube Intelligence Engine
 
-End-to-end NLP pipeline that scrapes YouTube comments, cleans noisy user text,
-extracts insight (NER, keywords, sentiment, topics), and serves grounded Q&A +
-summarization through a **RAG** system with an **agent** routing layer and
-**MLflow** monitoring.
-
-> CSCI370 course project. Pipeline: scrape → preprocess → enrich → index → RAG → agent → dashboard, monitored with MLflow.
-
-## Architecture
-
-```
-                         ┌─────────────────────────────────────────┐
- YouTube Data API  ──▶   │  scrape  →  preprocess  →  enrich        │
-   (or offline sample)   │   raw       clean text     NER           │
-                         │             (contractions  sentiment     │
-                         │              + acronyms)    keywords      │
-                         │                             topics        │
-                         └───────────────┬─────────────────────────┘
-                                         ▼
-                          ┌──────────────────────────────┐
-                          │   Vector store (ChromaDB)     │
-                          │   text + embedding + metadata │
-                          └───────────────┬──────────────┘
-                                          ▼
-            ┌──────────────────────────────────────────────────┐
-            │  RAG:  retrieval (semantic│lexical│metadata│hybrid)│
-            │        + LLM (Q&A / summarization, grounded)       │
-            └───────────────┬──────────────────────────────────┘
-                            ▼
-                ┌────────────────────────┐      ┌──────────────┐
-                │  Agent orchestrator     │ ◀──▶ │   MLflow      │
-                │  routes query → tool    │      │  monitoring   │
-                └───────────┬────────────┘      └──────────────┘
-                            ▼
-                   Streamlit dashboard
-```
-
-## Setup
-
-```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python -m spacy download en_core_web_sm     # for NER
-
-cp .env.example .env                         # then add your keys
-```
-
-`.env` keys (all optional — the pipeline runs offline on a built-in sample if
-they are blank):
-
-| Key | Used for |
-|-----|----------|
-| `YOUTUBE_API_KEY` | scraping real comments (YouTube Data API v3) |
-| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | RAG generation + LLM routing |
-
-## Run it
-
-```bash
-# 1. Scrape + clean + enrich + index (offline demo if no API key)
-python -m src.pipeline --query "your topic here" --videos 3 --max 300
-
-# 2. Inspect dictionary-based cleaning in isolation
-python -m src.preprocess.normalizer
-
-# 3. Launch the dashboard
-streamlit run app/dashboard.py
-
-# 4. View MLflow runs
-mlflow ui --backend-store-uri ./mlruns
-
-# 5. Tests
-pytest -q
-```
-
-## Preprocessing dictionaries
-
-Two normalization dictionaries live in `data/` and are applied in
-`src/preprocess/normalizer.py`:
-
-- **`contractions.txt`** (`key:value`) — `don't → do not`, `y'all → you all`
-- **`acronyms.csv`** (`key,value`) — `idk → I don't know`, `gr8 → great`,
-  `2moro → tomorrow` (3000+ internet-slang entries)
-
-Contractions win over acronyms on key collisions; multi-word keys
-(`fo shizzle`) are matched before single tokens. See `tests/test_normalizer.py`.
-
-## Module map
-
-| Path | Responsibility |
-|------|----------------|
-| `src/scrape/youtube_scraper.py` | YouTube Data API v3 comment scraping |
-| `src/preprocess/` | `normalizer` (dict expansion + spell), `cleaner` (full pipeline) |
-| `src/enrich/` | `ner`, `keywords`, `sentiment`, `topics` |
-| `src/rag/` | `vectorstore`, `retriever` (4 strategies), `generator`, `embeddings` |
-| `src/agent/orchestrator.py` | query → tool routing (rule-based + LLM) |
-| `src/monitoring/` | `mlflow_tracker`, `evaluate` (retrieval + RAG metrics) |
-| `src/pipeline.py` | one command runs the whole flow |
-| `app/dashboard.py` | Streamlit UI |
-
-## Rubric coverage
-
-| Rubric item | Where |
-|-------------|-------|
-| Dataset construction | `scrape/` + `preprocess/` |
-| NER / keyword / sentiment | `enrich/ner,keywords,sentiment` |
-| Topic modeling (general + per-sentiment) | `enrich/topics` |
-| RAG & LLM (20%) | `rag/` — 4 retrieval strategies, hybrid fusion, grounded prompts |
-| Agent orchestration | `agent/orchestrator` |
-| Evaluation & monitoring (15%) | `monitoring/evaluate` + MLflow |
-| Dashboard | `app/dashboard` |
-
-# YouTube Intelligence Engine
-
 ## CSCI370 Project — Fitness Coaching Comment Analysis
 
 This project is an end-to-end NLP system that analyses YouTube comments related to **fitness coaching**. It collects comments using the YouTube Data API, cleans noisy user-generated text, extracts insights using NLP techniques, indexes the processed comments into a vector database, and supports retrieval-based question answering through a RAG-style pipeline.
 
-The system includes:
-
-- YouTube comment scraping
-- Text preprocessing and normalisation
-- Sentiment analysis
-- Keyword extraction
-- Named Entity Recognition (NER)
-- Topic modelling overall and per sentiment
-- ChromaDB vector database indexing
-- Semantic, lexical and hybrid retrieval
-- Agent-based query routing
-- Streamlit dashboard
-- MLflow monitoring and retrieval evaluation
+The system includes YouTube comment scraping, preprocessing, sentiment analysis, keyword extraction, Named Entity Recognition, topic modelling, ChromaDB vector indexing, semantic/lexical/hybrid retrieval, agent-based query routing, a Streamlit dashboard, and MLflow monitoring.
 
 ---
 
@@ -169,7 +45,7 @@ The final dataset was created by scraping YouTube comments related to fitness co
 | Positive | 4,724 |
 | Negative | 1,150 |
 
-The dataset meets the minimum requirement of 10,000 comments.
+The dataset meets the minimum requirement of **10,000 comments**.
 
 ---
 
@@ -177,7 +53,7 @@ The dataset meets the minimum requirement of 10,000 comments.
 
 ### Dataset Construction
 
-The final dataset contains 10,764 raw comments, 10,764 enriched comments and 63 unique videos.
+The final dataset contains 10,764 raw comments, 10,764 enriched comments, and 63 unique videos.
 
 ![Dataset proof](./1-10k%20data%20set%20scraping.png)
 
@@ -229,41 +105,33 @@ The hybrid retrieval run recorded hit_rate_at_5 = 0.75 and MRR = 0.75.
 
 ## Architecture
 
-```text
-YouTube Data API
-        |
-        v
-Scraping
-        |
-        v
-Preprocessing
-        |
-        v
-NLP Enrichment
-- Sentiment analysis
-- Keyword extraction
-- Named Entity Recognition
-- Topic modelling
-        |
-        v
-ChromaDB Vector Store
-        |
-        v
-Retrieval
-- Semantic retrieval
-- Lexical retrieval
-- Hybrid retrieval
-        |
-        v
-RAG / LLM Response Generation
-        |
-        v
-Agent Orchestrator
-        |
-        v
-Streamlit Dashboard
+The system follows a modular NLP pipeline from YouTube scraping to dashboard output. Comments are collected from YouTube, cleaned and enriched with NLP techniques, indexed into ChromaDB for retrieval, routed through an agent layer, and monitored using MLflow.
 
-MLflow is used to track pipeline and retrieval evaluation results.
+```text
+                         ┌─────────────────────────────────────────┐
+ YouTube Data API  ──▶   │  scrape  →  preprocess  →  enrich        │
+                         │   raw       clean text     NER           │
+                         │             contractions   sentiment     │
+                         │             acronyms       keywords      │
+                         │                            topics        │
+                         └───────────────┬─────────────────────────┘
+                                         ▼
+                          ┌──────────────────────────────┐
+                          │   Vector store (ChromaDB)     │
+                          │   text + embedding + metadata │
+                          └───────────────┬──────────────┘
+                                          ▼
+            ┌──────────────────────────────────────────────────┐
+            │  RAG retrieval: semantic | lexical | hybrid       │
+            │  + grounded LLM Q&A / summarisation               │
+            └───────────────┬──────────────────────────────────┘
+                            ▼
+                ┌────────────────────────┐      ┌──────────────┐
+                │  Agent orchestrator     │ ◀──▶ │   MLflow      │
+                │  routes query → tool    │      │  monitoring   │
+                └───────────┬────────────┘      └──────────────┘
+                            ▼
+                   Streamlit dashboard
 ```
 
 ---
@@ -294,7 +162,7 @@ Comments are classified into:
 
 This helps identify whether viewers are praising, questioning, or criticising fitness coaching content.
 
-### 4. Keyword Extraction and NER
+### 4. Keyword Extraction and Named Entity Recognition
 
 The system extracts important keywords and entities from the processed comments. This helps identify repeated discussion points such as weight loss, workout plans, fat loss, diet, cardio and training.
 
@@ -408,6 +276,17 @@ youtube-intelligence-engine/
 ├── .env.example
 └── README.md
 ```
+
+---
+
+## Preprocessing Dictionaries
+
+Two normalisation dictionaries are used in the preprocessing pipeline:
+
+- `contractions.txt` — expands contractions such as `don't → do not` and `y'all → you all`
+- `acronyms.csv` — expands internet slang and short forms such as `idk → I don't know` and `gr8 → great`
+
+These help improve the quality of noisy YouTube comments before NLP analysis.
 
 ---
 
