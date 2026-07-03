@@ -71,7 +71,7 @@ The Streamlit dashboard displays the final dataset size and sentiment distributi
 
 Initial topic modelling was noisy because YouTube comments contained emoji-related tokens and repeated informal words.
 
-![Initial topic modelling](./2-topic%20modeling.png)
+![Initial topic modelling](./2-topic%20modeling%20.png)
 
 The topic modelling was then improved with extra cleaning and stopwords.
 
@@ -464,7 +464,7 @@ Future improvements could include:
 | Rubric Item | Project Evidence |
 |---|---|
 | Problem definition | Fitness coaching YouTube comment analysis |
-| System design | Modular scrape → preprocess → enrich → index → RAG → dashboard pipeline |
+| System design | Modular scrape → preprocess → enrich → index → RAG → agent → dashboard pipeline |
 | Dataset construction | 10,764 comments from 63 videos |
 | Insight extraction | Sentiment, NER and keyword extraction |
 | Topic modelling | Overall and per-sentiment topic modelling |
@@ -475,6 +475,4 @@ Future improvements could include:
 | Code quality | Modular source folder structure |
 
 ---
-
-
 
